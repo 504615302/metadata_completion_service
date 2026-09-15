@@ -1,0 +1,9 @@
+# 环境配置（勿提交含真实密码的文件到 Git）
+.env
+.env.local
+.env.prod
+.env.development
+.env.production
+!.env.example
+!.env.local
+!.env.prod

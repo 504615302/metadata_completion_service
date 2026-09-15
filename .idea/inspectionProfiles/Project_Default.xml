@@ -1,0 +1,31 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="fastapi" />
+          <option value="uvicorn" />
+          <option value="sqlalchemy" />
+          <option value="pymysql" />
+          <option value="pydantic" />
+          <option value="pydantic-settings" />
+          <option value="redis" />
+          <option value="aioredis" />
+          <option value="apscheduler" />
+          <option value="httpx" />
+          <option value="aiohttp" />
+          <option value="python-dotenv" />
+          <option value="sqlparse" />
+          <option value="sqllineage" />
+          <option value="tenacity" />
+          <option value="arrow" />
+          <option value="loguru" />
+          <option value="gudusoft-gsqlparser" />
+          <option value="elasticsearch" />
+          <option value="cryptography" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

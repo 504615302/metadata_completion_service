@@ -1,0 +1,14 @@
+services:
+  metadata-completion:
+    build: .
+    image: metadata-completion-service:latest
+    container_name: metadata-completion-service
+    restart: unless-stopped
+    ports:
+      - "18084:18084"
+    environment:
+      PORT: 18084
+      APP_ENV: prod
+    # 正式环境只需 .env.prod（与 docker-compose.yml 同目录）
+    env_file:
+      - .env.prod
