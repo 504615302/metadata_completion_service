@@ -212,7 +212,7 @@ async def parse_insert_sql_from_pg(
     从 MySQL 读取源表（默认列：id / SQL / workspace_name），
     由大模型解析 INSERT 血缘。
 
-    - 默认仅处理 workspace_name = MYSQL_WORKSPACE_FILTER（面向基层数据服务）
+    - 默认处理 MYSQL_WORKSPACE_FILTER 中以英文逗号分隔的工作空间
     - process_all=true（默认）：按 limit 翻页直到扫完
     - skip_processed=true（默认）：按 Redis `{redis_record_key_prefix}:{id}` 决定跳过
       - retry_failed=false（默认）：有记录（成功/失败）一律跳过
@@ -270,7 +270,7 @@ async def extract_sql_joins_from_pg(
     """
     读取源表中的 SQL，用大模型提取 JOIN 关联：
 
-    - 默认仅处理 workspace_name = MYSQL_WORKSPACE_FILTER（面向基层数据服务）
+    - 默认处理 MYSQL_WORKSPACE_FILTER 中以英文逗号分隔的工作空间
     - 主表 primary：schema_name、table_name、join_fields
     - 从表 secondary：schema_name、table_name、join_fields
     - join_expression：如 `A left join B on A.id=B.id`
@@ -415,5 +415,4 @@ if __name__ == "__main__":
         uvicorn.run('app.main:app', host="0.0.0.0", port=port, reload=args.debug)
     else:
         uvicorn.run('app.main:app', host="0.0.0.0", port=port, reload=args.debug)
-
 

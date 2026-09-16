@@ -317,7 +317,7 @@ class InsertSqlParseRequest(BaseModel):
     offset: int = Field(default=0, ge=0, description="起始偏移；process_all=true 时从该 offset 一直翻到末尾")
     workspace_name: Optional[str] = Field(
         default=None,
-        description="覆盖 MYSQL_WORKSPACE_FILTER；不传则只用配置默认值（面向基层数据服务）",
+        description="覆盖 MYSQL_WORKSPACE_FILTER；支持英文逗号分隔多个工作空间",
     )
     persist: bool = True  # 解析成功后写入血缘结果表
     expand_star_from_graph: bool = True  # SELECT * / t.* 时从 ArangoDB 展开字段
@@ -427,7 +427,7 @@ class SqlJoinExtractRequest(BaseModel):
     offset: int = Field(default=0, ge=0, description="起始偏移")
     workspace_name: Optional[str] = Field(
         default=None,
-        description="覆盖 MYSQL_WORKSPACE_FILTER；不传则只用配置默认值",
+        description="覆盖 MYSQL_WORKSPACE_FILTER；支持英文逗号分隔多个工作空间",
     )
     persist: bool = True
     process_all: bool = True

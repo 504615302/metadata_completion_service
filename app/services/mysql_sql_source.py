@@ -1,13 +1,13 @@
 """
 从 MySQL 读取待解析 INSERT SQL，并用大模型解析表/字段关系与中文名。
 支持全量翻页、Redis 跳过已处理、页内并发调用 LLM。
-默认仅处理 workspace_name = MYSQL_WORKSPACE_FILTER（面向基层数据服务）。
+默认处理 MYSQL_WORKSPACE_FILTER 中以英文逗号分隔的工作空间。
 """
 from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import anyio
 
@@ -25,16 +25,9 @@ from app.services.insert_sql_parse import parse_insert_sql
 from app.services.insert_sql_progress import mark_insert_sql_processed, should_skip_insert_sql
 from app.services.mysql_lineage_store import save_parse_item
 from app.services.mysql_schema import quote_ident
+from app.services.workspace_filter import build_workspace_condition, resolve_workspace_filters
 
 logger = logging.getLogger(__name__)
-
-
-def _resolve_workspace_filter(override: Optional[str]) -> Optional[str]:
-    """请求覆盖优先，否则用配置；空串表示不过滤。"""
-    settings = get_settings()
-    raw = override if override is not None else settings.mysql_workspace_filter
-    value = (raw or "").strip()
-    return value or None
 
 
 def _fetch_page(
@@ -117,10 +110,11 @@ async def fetch_and_parse_insert_sql(request: InsertSqlParseRequest) -> InsertSq
     where_parts: list[str] = [f"{col_sql} IS NOT NULL", f"TRIM({col_sql}) <> ''"]
     base_params: list[Any] = []
 
-    workspace_filter = _resolve_workspace_filter(request.workspace_name)
-    if workspace_filter:
-        base_params.append(workspace_filter)
-        where_parts.append(f"{col_workspace} = %s")
+    workspace_filters = resolve_workspace_filters(request.workspace_name)
+    if workspace_filters:
+        condition, filter_params = build_workspace_condition(col_workspace, workspace_filters)
+        where_parts.append(condition)
+        base_params.extend(filter_params)
 
     where_sql = " AND ".join(where_parts)
     page_size = request.limit
@@ -140,7 +134,7 @@ async def fetch_and_parse_insert_sql(request: InsertSqlParseRequest) -> InsertSq
     logger.info(
         "INSERT SQL 批量解析启动: workspace_filter=%s, process_all=%s, skip_processed=%s, "
         "retry_failed=%s, page_size=%s, offset=%s, concurrency=%s",
-        workspace_filter,
+        workspace_filters,
         request.process_all,
         request.skip_processed,
         request.retry_failed,
